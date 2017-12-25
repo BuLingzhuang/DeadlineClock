@@ -1,0 +1,67 @@
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             xmlns:tools="http://schemas.android.com/tools"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="match_parent"
+                                             tools:context="com.bulingzhuang.dlc.views.fragment.MainHomeFragment">
+
+    <com.bulingzhuang.dlc.views.ui.SesameCreditView
+        android:id="@+id/scv_progress"
+        android:layout_width="320dp"
+        android:layout_height="260dp"
+        app:currentNum="5400"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.233"/>
+
+    <ImageView
+        android:id="@+id/iv_coin"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        app:layout_constraintBottom_toBottomOf="@id/scv_progress"
+        app:layout_constraintEnd_toEndOf="@id/scv_progress"
+        app:layout_constraintHorizontal_bias="0.44"
+        app:layout_constraintStart_toStartOf="@id/scv_progress"
+        app:layout_constraintTop_toTopOf="@id/scv_progress"
+        app:layout_constraintVertical_bias="0.63"
+        app:srcCompat="@drawable/ic_coin"/>
+
+    <TextView
+        android:id="@+id/tv_coin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:text="x3"
+        android:textColor="@android:color/white"
+        android:textScaleX="1.1"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toBottomOf="@id/iv_coin"
+        app:layout_constraintStart_toEndOf="@id/iv_coin"/>
+
+    <com.bulingzhuang.dlc.views.ui.WaveView
+        android:layout_width="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scv_progress"
+        android:layout_height="120dp"/>
+
+    <TextView
+        android:id="@+id/btn_star"
+        android:layout_width="120dp"
+        android:visibility="gone"
+        android:layout_height="wrap_content"
+        android:background="@drawable/home_bg"
+        android:gravity="center"
+        android:padding="11dp"
+        android:text="开始"
+        android:textColor="@color/colorAccent"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scv_progress"/>
+
+</android.support.constraint.ConstraintLayout>

@@ -3,17 +3,189 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cl_gen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.bulingzhuang.dlc.MainActivity">
 
+    <android.support.v4.view.ViewPager
+        android:id="@+id/vp_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
     <TextView
+        android:id="@+id/tv_coin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginEnd="@dimen/horizontal_margin"
+        android:layout_marginTop="@dimen/horizontal_margin"
+        android:text="0"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
+
+    <ImageView
+        android:id="@+id/iv_coin"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="6dp"
+        app:layout_constraintBottom_toBottomOf="@id/tv_coin"
+        app:layout_constraintEnd_toStartOf="@id/tv_coin"
+        app:layout_constraintTop_toTopOf="@id/tv_coin"
+        app:srcCompat="@drawable/ic_coin"/>
+
+    <LinearLayout
+        android:id="@+id/ll_bottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/horizontal_margin"
+        android:layout_marginStart="@dimen/horizontal_margin"
+        android:background="@drawable/bg"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_weight="1">
+
+            <ImageView
+                android:id="@+id/iv_home"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:layout_centerHorizontal="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="12dp"
+                app:srcCompat="@drawable/ic_home"/>
+
+            <com.bulingzhuang.dlc.views.ui.TriangleView
+                android:id="@+id/t_home"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                app:heightPercent="0.6"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_weight="1">
+
+            <ImageView
+                android:id="@+id/iv_achievement"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:layout_centerHorizontal="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="10dp"
+                app:srcCompat="@drawable/ic_achievement"/>
+
+            <com.bulingzhuang.dlc.views.ui.TriangleView
+                android:id="@+id/t_achievement"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:alpha="0"
+                app:heightPercent="0.6"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_weight="1">
+
+            <ImageView
+                android:id="@+id/iv_mine"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:layout_centerHorizontal="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="10dp"
+                app:srcCompat="@drawable/ic_mine"/>
+
+            <com.bulingzhuang.dlc.views.ui.TriangleView
+                android:id="@+id/t_mine"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:alpha="0"
+                app:heightPercent="0.6"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_weight="1">
+
+            <ImageView
+                android:id="@+id/iv_shutdown"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:layout_centerHorizontal="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="11dp"
+                app:srcCompat="@drawable/ic_shutdown"/>
+        </RelativeLayout>
+    </LinearLayout>
+
+    <com.bulingzhuang.dlc.views.ui.SafeAreaView
+        android:layout_width="6dp"
+        android:layout_height="6dp"
+        app:bgColor="@color/colorPrimaryDark"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/ll_bottomBar"
+        app:type="0"/>
+
+    <com.bulingzhuang.dlc.views.ui.SafeAreaView
+        android:layout_width="6dp"
+        android:layout_height="6dp"
+        app:bgColor="@color/colorPrimaryDark"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/ll_bottomBar"
+        app:type="1"/>
+
+    <com.bulingzhuang.dlc.views.ui.SafeAreaView
+        android:layout_width="6dp"
+        android:layout_height="6dp"
+        app:bgColor="@color/colorPrimaryDark"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:type="1"/>
+
+    <com.bulingzhuang.dlc.views.ui.SafeAreaView
+        android:layout_width="6dp"
+        android:layout_height="6dp"
+        app:bgColor="@color/colorPrimaryDark"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:type="0"/>
+
+    <com.bulingzhuang.dlc.views.ui.SafeAreaView
+        android:layout_width="7dp"
+        android:layout_height="7dp"
+        app:bgColor="@color/colorPrimaryDark"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:type="2"/>
+
+    <com.bulingzhuang.dlc.views.ui.SafeAreaView
+        android:layout_width="7dp"
+        android:layout_height="7dp"
+        app:bgColor="@color/colorPrimaryDark"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:type="3"/>
 
 </android.support.constraint.ConstraintLayout>
