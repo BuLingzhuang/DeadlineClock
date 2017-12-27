@@ -3,11 +3,12 @@
     <color name="colorPrimary">#FF37474f</color>
     <color name="colorPrimaryDark">#FF263238</color>
     <color name="colorAccent">#75EAD7</color>
+    <color name="colorAccentAlpha">#7775EAD7</color>
 
     <color name="black">#000000</color>
 
     <color name="regionStartColor">#75EAD7</color>
-    <color name="regionEndColor">#263238</color>
+    <color name="regionEndColor">#FF37474f</color>
     <color name="regionCenterColor">#75EAD7</color>
     <color name="pointColor">#75EAD7</color>
 

@@ -7,6 +7,10 @@ public class Random {
         return lower + RANDOM.nextFloat() * (upper - lower);
     }
 
+    public int getRandomInt(){
+        return RANDOM.nextInt(2);
+    }
+
     public float getRandom(float upper) {
         return RANDOM.nextFloat() * upper;
     }

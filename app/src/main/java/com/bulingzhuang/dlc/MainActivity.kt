@@ -1,14 +1,18 @@
 package com.bulingzhuang.dlc
 
-import android.support.v7.app.AppCompatActivity
+import android.content.*
 import android.os.Bundle
+import android.os.IBinder
+import android.provider.Settings
+import android.support.design.widget.Snackbar
 import android.support.v4.view.ViewPager
+import android.support.v7.app.AppCompatActivity
 import android.transition.TransitionManager
 import android.view.KeyEvent
 import android.view.View
-import com.bulingzhuang.dlc.util.setViewsOnClickListener
-import com.bulingzhuang.dlc.util.showLogE
-import com.bulingzhuang.dlc.util.showToast
+import com.bulingzhuang.dlc.receiver.MyReceiver
+import com.bulingzhuang.dlc.service.CountDownService
+import com.bulingzhuang.dlc.util.*
 import com.bulingzhuang.dlc.views.adapter.CommonPagerAdapter
 import com.bulingzhuang.dlc.views.fragment.BaseFragment
 import com.bulingzhuang.dlc.views.fragment.MainHomeFragment
@@ -16,21 +20,64 @@ import com.bulingzhuang.dlc.views.fragment.TestFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 
-class MainActivity : AppCompatActivity(), View.OnClickListener {
+class MainActivity : AppCompatActivity(), View.OnClickListener, MyReceiver.ReceiverListener {
+
+    companion object {
+        val tagName: String = MainActivity::class.java.name
+    }
 
     private val mFragmentList = ArrayList<BaseFragment>()
     private var mCurrentSelPos = 0
+
+    private var mBinder: CountDownService.MyBinder? = null
+
+    private val mConn = object : ServiceConnection {
+        override fun onServiceDisconnected(name: ComponentName?) {
+
+        }
+
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            if (service != null && service is CountDownService.MyBinder) {
+                mBinder = service
+            }
+        }
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION xor View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
         init()
+        showLogE("create")
     }
 
     override fun onResume() {
         super.onResume()
+        showLogE("resume")
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION xor View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+        if (!AccessibilityUtils.isAccessibilityOpen(this)) {
+            showSnakeBarWithAction("麻烦开一下辅助权限，谢谢 ( ˘•ω•˘ )", cl_gen, "前往",
+                    View.OnClickListener { AccessibilityUtils.goAccess(this) },
+                    Snackbar.LENGTH_INDEFINITE)
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        showLogE("pause")
+        stopService(Intent(this, CountDownService::class.java))
+    }
+
+    override fun onStop() {
+        super.onStop()
+        showLogE("stop")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        showLogE("destroy")
+        unbindService(mConn)
     }
 
     private fun init() {
@@ -48,6 +95,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
             override fun onPageSelected(position: Int) {}
         })
+        startService(Intent(this, CountDownService::class.java))
+        bindService(Intent(this, CountDownService::class.java), mConn, Context.BIND_AUTO_CREATE)
+        val filter = IntentFilter()
+        filter.addAction(Constants.RECEIVER_ACTION_DETECTION)
+        registerReceiver(MyReceiver(this), filter)
     }
 
 
@@ -89,6 +141,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 t_mine.alpha = 1f
             }
         }
+    }
+
+    /**
+     * 当前应用是否是前台应用的监听
+     */
+    override fun isForeground(isForeground: Boolean) {
+        mBinder?.cancelCountDown()
     }
 
     private var firstTime = 0L

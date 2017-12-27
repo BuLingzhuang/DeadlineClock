@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/horizontal_margin"
-        android:layout_marginTop="@dimen/horizontal_margin"
+        android:layout_marginTop="@dimen/vertical_margin"
         android:text="0"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="15sp"
@@ -39,6 +39,29 @@
         app:layout_constraintEnd_toStartOf="@id/tv_coin"
         app:layout_constraintTop_toTopOf="@id/tv_coin"
         app:srcCompat="@drawable/ic_coin"/>
+
+    <TextView
+        android:id="@+id/tv_coin_fail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/horizontal_margin"
+        android:layout_marginTop="3dp"
+        android:text="0"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_coin"/>
+
+    <ImageView
+        android:id="@+id/iv_coin_fail"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="6dp"
+        app:layout_constraintBottom_toBottomOf="@id/tv_coin_fail"
+        app:layout_constraintEnd_toStartOf="@id/tv_coin_fail"
+        app:layout_constraintTop_toTopOf="@id/tv_coin_fail"
+        app:srcCompat="@drawable/ic_coin_fail"/>
 
     <LinearLayout
         android:id="@+id/ll_bottomBar"

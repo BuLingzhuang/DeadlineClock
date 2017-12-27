@@ -3,27 +3,15 @@ package com.bulingzhuang.dlc.views.ui;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.RectF;
-import android.graphics.Shader;
-import android.graphics.Xfermode;
-import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.SparseArray;
 
 import com.bulingzhuang.dlc.R;
-import com.bulingzhuang.dlc.views.ui.widget.PointFlake;
 import com.bulingzhuang.dlc.views.ui.widget.RenderView;
 
 public class WaveView extends RenderView {
-
-    private static final String TAG = "WaveView";
-
-    private static final int NUM_POINTFLAKES = 7;
 
     public WaveView(Context context) {
         this(context, null);
@@ -35,35 +23,30 @@ public class WaveView extends RenderView {
 
     public WaveView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        paint.setStrokeWidth(dp2px(context,2.5f));
     }
 
     /*绘图*/
 
     private final Paint paint = new Paint();
 
-    private final Paint clearScreenPaint = new Paint();
-
     private int regionStartColor = getResources().getColor(R.color.regionStartColor);
-    private int regionCenterColor = getResources().getColor(R.color.regionCenterColor);
     private int regionEndColor = getResources().getColor(R.color.regionEndColor);
 
     {
         paint.setDither(true);
         paint.setAntiAlias(true);
+        paint.setStyle(Paint.Style.STROKE);
     }
 
     private final Path firstPath = new Path();
     private final Path secondPath = new Path();
-    /**
-     * 两条正弦波之间的波，振幅比较低的那一条
-     */
-    private final Path centerPath = new Path();
 
     /**
      * 采样点的数量，越高越精细，
      * 但高于一定限度后人眼察觉不出。
      */
-    private static final int SAMPLING_SIZE = 64;
+    private static final int SAMPLING_SIZE = 128;
     /**
      * 采样点的X
      */
@@ -76,7 +59,7 @@ public class WaveView extends RenderView {
     /**
      * 画布宽高
      */
-    private int width, height;
+    private int width;
     /**
      * 画布中心的高度
      */
@@ -100,30 +83,12 @@ public class WaveView extends RenderView {
         }
     }
 
-    /**
-     * 用于处理矩形的rectF
-     */
-    private final RectF rectF = new RectF();
-
-    /**
-     * 绘图交叉模式。放在成员变量避免每次重复创建。
-     */
-    private final Xfermode clipXfermode = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
-
-    private final Xfermode clearXfermode = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
-
-    private final Xfermode srcXfermode = new PorterDuffXfermode(PorterDuff.Mode.SRC);
-
-    private final int backGroundColor = Color.rgb(24, 33, 41);
-
-    private PointFlake[] pointFlakes = new PointFlake[NUM_POINTFLAKES];
-
     @Override
     protected void onRender(Canvas canvas, long millisPassed) {
         if (samplingX == null) {//首次初始化
             //赋值基本参数
             width = canvas.getWidth();
-            height = canvas.getHeight();
+            int height = canvas.getHeight();
             centerHeight = height >> 1;
             amplitude = width / 10;//振幅为宽度的1/10
 
@@ -137,41 +102,20 @@ public class WaveView extends RenderView {
                 samplingX[i] = x;
                 mapX[i] = (x / (float) width) * 4 - 2;//将x映射到[-2,2]的区间上
             }
-            //雪点
-            Paint pointPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            pointPaint.setColor(getResources().getColor(R.color.pointColor));
-            pointPaint.setStyle(Paint.Style.FILL);
-            pointFlakes[0] = PointFlake.create(width / 12, centerHeight - amplitude / 3, width / 12, centerHeight + amplitude / 3, pointPaint);
-            pointFlakes[1] = PointFlake.create(width / 4, centerHeight - amplitude / 5, width / 4 + 20, centerHeight + amplitude / 5, pointPaint);
-            pointFlakes[2] = PointFlake.create(width / 3, centerHeight - amplitude / 3 / 8, width / 3 + 5, centerHeight + amplitude / 2, pointPaint);
-            pointFlakes[3] = PointFlake.create(width / 2, centerHeight - amplitude / 5, width / 9 * 5, centerHeight + amplitude / 3 * 2, pointPaint);
-            pointFlakes[4] = PointFlake.create(width / 3 * 2, centerHeight, width / 4 * 3, centerHeight + amplitude / 3 * 2, pointPaint);
-            pointFlakes[5] = PointFlake.create(width / 6 * 5, centerHeight - amplitude / 4, width / 8 * 7, centerHeight, pointPaint);
-            pointFlakes[6] = PointFlake.create(width / 9 * 8, centerHeight - amplitude / 2, width / 11 * 10, centerHeight + amplitude / 3 * 2, pointPaint);
-
         }
 
-        //清屏
-        //清屏后背景为纯黑色，不好用
-//        int count = canvas.saveLayer(0, 0, width, height, clearScreenPaint);
-//        clearScreenPaint.setXfermode(clearXfermode);
-//        canvas.drawRect(0,0,width,height,clearScreenPaint);
-//        clearScreenPaint.setXfermode(srcXfermode);
-//        canvas.restoreToCount(count);
         canvas.drawColor(Color.WHITE);
 
 
         //重置所有path并移动到起点
         firstPath.rewind();
         secondPath.rewind();
-        centerPath.rewind();
         firstPath.moveTo(0, centerHeight);
         secondPath.moveTo(0, centerHeight);
-        centerPath.moveTo(0, centerHeight);
 
         //当前时间的偏移量，通过该偏移量使得每次绘图都向右偏移，让画面动起来
         //如果希望速度快一点，可以调小分母
-        float offset = millisPassed / 2000F;
+        float offset = millisPassed / 2333F;
 
         //提前申明各种临时参数
         float x;
@@ -198,8 +142,6 @@ public class WaveView extends RenderView {
             //连接路径
             firstPath.lineTo(x, centerHeight + curV);
             secondPath.lineTo(x, centerHeight - curV);
-            //中间那条路径的振幅是上下的1/5
-            centerPath.lineTo(x, centerHeight + curV / 5F);
 
             //记录极值点
             absLastV = Math.abs(lastV);
@@ -220,57 +162,14 @@ public class WaveView extends RenderView {
         //连接所有路径到终点
         firstPath.lineTo(width, centerHeight);
         secondPath.lineTo(width, centerHeight);
-        centerPath.lineTo(width, centerHeight);
-
-        //记录layer
-        int saveCount = canvas.saveLayer(0, 0, width, height, null, Canvas.ALL_SAVE_FLAG);  //相关知识点： http://blog.csdn.net/cquwentao/article/details/51423371
-
-        //填充上下两条正弦函数
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(1);
-        canvas.drawPath(firstPath, paint);
-        canvas.drawPath(secondPath, paint);
-
-        //绘制渐变
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.WHITE);
-        paint.setXfermode(clipXfermode);
-        float startX, crestY, endX;
-        for (int i = 2; i < crestAndCrossCount; i += 2) {
-            //每隔两个点可绘制一个矩形。这里先计算矩形的参数
-            startX = crestAndCrossPints[i - 2][0];
-            crestY = crestAndCrossPints[i - 1][1];
-            endX = crestAndCrossPints[i][0];
-
-            //crestY有正有负，无需去计算渐变是从上到下还是从下到上
-            paint.setShader(new LinearGradient(0, centerHeight + crestY, 0, centerHeight - crestY, getResources().getColor(R.color.regionStartColor), getResources().getColor(R.color.regionEndColor), Shader.TileMode.CLAMP));
-            rectF.set(startX, centerHeight + crestY, endX, centerHeight - crestY);
-            canvas.drawRect(rectF, paint);
-        }
-        //清理一下
-        paint.setShader(null);
-        paint.setXfermode(null);
-
-        //叠加layer，因为使用了SRC_IN的模式所以只会保留波形渐变重合的地方
-        canvas.restoreToCount(saveCount);
 
         //绘制上弦线
-        paint.setStrokeWidth(3);
-        paint.setStyle(Paint.Style.STROKE);
         paint.setColor(regionStartColor);
         canvas.drawPath(firstPath, paint);
 
         //绘制下弦线
         paint.setColor(regionEndColor);
         canvas.drawPath(secondPath, paint);
-
-        //绘制中间线
-//        paint.setColor(regionCenterColor);
-//        canvas.drawPath(centerPath, paint);
-
-        for (PointFlake snowFlake : pointFlakes) {
-            snowFlake.draw(canvas);
-        }
     }
 
     /**
@@ -295,4 +194,12 @@ public class WaveView extends RenderView {
     }
 
     SparseArray<Double> recessionFuncs = new SparseArray<>();
+
+    /**
+     * 根据手机的分辨率从 dp 的单位 转成为 px(像素)
+     */
+    public static int dp2px(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
+    }
 }

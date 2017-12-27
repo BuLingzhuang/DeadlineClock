@@ -1,6 +1,4 @@
 <resources>
-    <string name="app_name">DeadlineClock</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="app_name">Deadline</string>
+    <string name="description">说明：\n    开启辅助权限是用于检测你是不是偷摸玩手机了，并不会搜集你的任何隐私信息。\n   *注：如果觉得不妥，直接卸载就好了..._(:з」∠)_</string>
 </resources>

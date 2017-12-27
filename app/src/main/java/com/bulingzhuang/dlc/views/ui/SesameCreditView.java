@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RadialGradient;
@@ -13,7 +14,6 @@ import android.graphics.Shader;
 import android.graphics.SweepGradient;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -32,22 +32,22 @@ public class SesameCreditView extends View {
 
     private int mMaxNum, mStartAngle;
     private int mSweepOutWidth;
-    private Paint mPaint, mPaint_1, mPaint_2, mPaint_3, mPaint_4, mPaint_Bg;
+    private Paint mPaint, mPaint_1, mPaint_2, mPaint_3, mPaint_Bg;
     private int mWidth, mHeight;
     private int mRadius;
     private Context mContext;
-    private float mBgLeft, mBgTop, mBgRight, mBgBottom;//标记最外圈范围
     private NumChangeListener mListener;
     private boolean isEdit = true;//是否是可编辑模式
 
-    private int[] indicatorColor = {0xffffffff, ContextCompat.getColor(getContext(), R.color.colorAccent)};
-    private int[] indicatorColorBg = {ContextCompat.getColor(getContext(), R.color.colorPrimary), ContextCompat.getColor(getContext(), R.color.colorPrimary), ContextCompat.getColor(getContext(), R.color.colorAccent)};
+    private int[] indicatorColor = {Color.WHITE, ContextCompat.getColor(getContext(), R.color.colorAccent)};
+    private int[] indicatorColorBg = {ContextCompat.getColor(getContext(), R.color.colorPrimary), ContextCompat.getColor(getContext(), R.color.colorAccentAlpha)};
 
-    private int currentNum;
+    private int currentNum, secondNum;//当前数值，设置好之后的最大数值(第二层数值)
     private SweepGradient mSweepGradient;
     private int mW;//圆环和点宽度
     private float mIndicatorX;
     private float mIndicatorY;
+    private RectF mRectF;
 
     interface NumChangeListener {
         void numChange(int cNum);
@@ -61,6 +61,10 @@ public class SesameCreditView extends View {
         return currentNum;
     }
 
+    public void setEdit(boolean isEdit) {
+        this.isEdit = isEdit;
+    }
+
     public void setCurrentNum(int cNum) {
         if (currentNum > 270 * 20 && cNum < 180 * 20) {
             currentNum = 7200;
@@ -71,6 +75,9 @@ public class SesameCreditView extends View {
         }
         if (mListener != null) {
             mListener.numChange(currentNum);
+        }
+        if (isEdit) {
+            secondNum = currentNum;
         }
         invalidate();
     }
@@ -98,14 +105,14 @@ public class SesameCreditView extends View {
 
     private void initPaint() {
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-//        mPaint.setDither(true);
-//        mPaint.setStyle(Paint.Style.STROKE);
-//        mPaint.setColor(Color.WHITE);
+        mPaint.setDither(true);
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeCap(Paint.Cap.ROUND);
+
         mPaint_1 = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaint_1.setStrokeCap(Paint.Cap.ROUND);
         mPaint_2 = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaint_3 = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mPaint_4 = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaint_Bg = new Paint(Paint.ANTI_ALIAS_FLAG);
 
         mPaint_1.setStyle(Paint.Style.STROKE);
@@ -119,9 +126,16 @@ public class SesameCreditView extends View {
         mMaxNum = typedArray.getInt(R.styleable.SesameCreditView_maxNum, 7200);
         mStartAngle = typedArray.getInt(R.styleable.SesameCreditView_startAngle, 90);
         currentNum = typedArray.getInt(R.styleable.SesameCreditView_currentNum, 7200);
+        secondNum = currentNum;
         int backgroundColor = typedArray.getColor(R.styleable.SesameCreditView_scvBackground, ContextCompat.getColor(context, R.color.colorPrimary));
         mPaint_Bg.setColor(backgroundColor);
         typedArray.recycle();
+
+        SweepGradient sweepGradient = new SweepGradient(0, 0, indicatorColorBg, null);
+        Matrix matrix_0 = new Matrix();
+        matrix_0.setRotate(mStartAngle);
+        sweepGradient.setLocalMatrix(matrix_0);
+        mPaint.setShader(sweepGradient);
 
         mSweepGradient = new SweepGradient(0, 0, indicatorColor, null);
         Matrix matrix = new Matrix();
@@ -129,9 +143,9 @@ public class SesameCreditView extends View {
         mSweepGradient.setLocalMatrix(matrix);
         mW = dp2px(mContext, WIDTH);
 
-
         //圆环弧度的宽度
         mSweepOutWidth = dp2px(context, 5);
+        mPaint.setStrokeWidth(mSweepOutWidth * 0.88f);
     }
 
     @Override
@@ -139,11 +153,8 @@ public class SesameCreditView extends View {
         super.onSizeChanged(w, h, oldw, oldh);
         RadialGradient shader = new RadialGradient(mWidth / 2, mHeight / 2, Math.min(mWidth / 2, mHeight / 2), mPaint_Bg.getColor(), mPaint_Bg.getColor(), Shader.TileMode.CLAMP);
         mRadius = w / 4;
+        mRectF = new RectF(-mRadius - mW, -mRadius - mW, mRadius + mW, mRadius + mW);
         mPaint_Bg.setShader(shader);
-        mBgLeft = w / 2 - mRadius * 1.5f;
-        mBgRight = w / 2 + mRadius * 1.5f;
-        mBgTop = h / 2 - mRadius * 1.5f;
-        mBgBottom = h / 2 + mRadius * 1.5f;
     }
 
     @Override
@@ -192,7 +203,7 @@ public class SesameCreditView extends View {
     private String getTime() {
         int min = currentNum / 60;
         int sec = currentNum % 60;
-        if (sec > 10) {
+        if (sec >= 10) {
             return min + ":" + sec;
         } else {
             return min + ":0" + sec;
@@ -212,8 +223,7 @@ public class SesameCreditView extends View {
         }
         mPaint_1.setStrokeWidth(mSweepOutWidth);
         mPaint_1.setShader(mSweepGradient);
-        RectF rectF = new RectF(-mRadius - mW, -mRadius - mW, mRadius + mW, mRadius + mW);
-        canvas.drawArc(rectF, mStartAngle, sweep, false, mPaint_1);
+        canvas.drawArc(mRectF, mStartAngle, sweep, false, mPaint_1);
 
         mIndicatorX = (float) ((mRadius + mW) * Math.cos(Math.toRadians(mStartAngle + sweep)));
         mIndicatorY = (float) ((mRadius + mW) * Math.sin(Math.toRadians(mStartAngle + sweep)));
@@ -223,25 +233,7 @@ public class SesameCreditView extends View {
 
     private void drawRound(Canvas canvas) {
         canvas.save();
-        RectF rectF1 = new RectF(-mRadius - mW, -mRadius - mW, mRadius + mW, mRadius + mW);
-
-        mPaint_4.setDither(true);
-        mPaint_4.setStyle(Paint.Style.STROKE);
-        mPaint_4.setStrokeWidth(mSweepOutWidth);
-        mPaint_4.setColor(0x23000000);
-        mPaint_4.setMaskFilter(new BlurMaskFilter(mW, BlurMaskFilter.Blur.SOLID));
-        canvas.drawArc(rectF1, mStartAngle, 360 * currentNum / mMaxNum, false, mPaint_4);
-
-        mPaint.setDither(true);
-        mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setStrokeWidth(mSweepOutWidth);
-        SweepGradient sweepGradient = new SweepGradient(0, 0, indicatorColorBg, null);
-        Matrix matrix = new Matrix();
-        matrix.setRotate(mStartAngle);
-        sweepGradient.setLocalMatrix(matrix);
-        mPaint.setShader(sweepGradient);
-        RectF rectF = new RectF(-mRadius - mW, -mRadius - mW, mRadius + mW, mRadius + mW);
-        canvas.drawArc(rectF, mStartAngle, 360 * currentNum / mMaxNum, false, mPaint);
+        canvas.drawArc(mRectF, mStartAngle, 360 * secondNum / mMaxNum, false, mPaint);
         canvas.restore();
     }
 
@@ -265,7 +257,7 @@ public class SesameCreditView extends View {
                         getParent().requestDisallowInterceptTouchEvent(true);
 //                        Log.e("blz", "x=" + x + ",inX=" + (mIndicatorX + mWidth / 2) + ",y=" + y + ",inY=" + (mIndicatorY + mHeight / 2) + ",mW=" + mW);
                         if (Math.abs(x - mIndicatorX - mWidth / 2) < mW / 2 && Math.abs(y - mIndicatorY - mHeight / 2) < mW / 2) {
-                            Log.e("blz", "戳到了D");
+//                            Log.e("blz", "戳到了D");
                             canMove = true;
                         }
                     }
@@ -277,7 +269,7 @@ public class SesameCreditView extends View {
                             v -= 360;
                         }
                         setCurrentNum((int) (v / 6) * 120);
-                        Log.e("blz", "atan=" + v);
+//                        Log.e("blz", "atan=" + v);
                     }
                     break;
                 case MotionEvent.ACTION_UP:
