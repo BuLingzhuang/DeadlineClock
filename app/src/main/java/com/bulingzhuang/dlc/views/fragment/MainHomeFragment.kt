@@ -1,23 +1,21 @@
 package com.bulingzhuang.dlc.views.fragment
 
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
-import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
 import com.bulingzhuang.dlc.R
 import com.bulingzhuang.dlc.service.CountDownService
-import com.bulingzhuang.dlc.util.AccessibilityUtils
-import com.bulingzhuang.dlc.util.setViewsOnClickListener
-import com.bulingzhuang.dlc.util.showLogE
-import com.bulingzhuang.dlc.util.showToast
+import com.bulingzhuang.dlc.util.*
 import kotlinx.android.synthetic.main.fragment_main_home.*
 
 
@@ -117,25 +115,42 @@ class MainHomeFragment : BaseFragment(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.btn_start -> {
-                showCountDown()
-                mBinder?.startCountDown(scv_progress.currentNum)
+                if (SharePreferencesUtil.getBoolean(Constants.SP_HIDE_START_NOTE)) {
+                    startCountDown()
+                } else {
+                    HomeDialogFragment.newInstance().show(childFragmentManager, "HomeDialog")
+                }
             }
         }
     }
 
+    /**
+     * 开始专注倒计时
+     */
+    fun startCountDown() {
+        showCountDown()
+        mBinder?.startCountDown(scv_progress.currentNum)
+    }
+
+    /**
+     * 展示倒计时中样式
+     */
     private fun showCountDown() {
+        scv_progress.setEdit(false)
         wv.visibility = View.VISIBLE
         v_visibility.visibility = View.GONE
         btn_start.visibility = View.GONE
-        scv_progress.setEdit(false)
     }
 
+    /**
+     * 展示编辑样式
+     */
     private fun showEdit() {
+        scv_progress.currentNum = 5400
+        scv_progress.setEdit(true)
+        btn_start.visibility = View.VISIBLE
         wv.visibility = View.GONE
         v_visibility.visibility = View.GONE
-        scv_progress.currentNum = 5400
-        btn_start.visibility = View.VISIBLE
-        scv_progress.setEdit(true)
     }
 
     override fun onDestroy() {

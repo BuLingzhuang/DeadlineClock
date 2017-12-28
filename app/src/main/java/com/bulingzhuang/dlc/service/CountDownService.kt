@@ -47,9 +47,10 @@ class CountDownService : Service() {
     }
 
     override fun onDestroy() {
-        showLogE("service的onDestroy")
-        mBinder.cancelCountDown()
         super.onDestroy()
+        showLogE("service的onDestroy")
+        showLogE("service取消的")
+        mBinder.cancelCountDown()
     }
 
     inner class MyBinder : Binder() {

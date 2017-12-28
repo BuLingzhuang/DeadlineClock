@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, MyReceiver.Recei
     }
 
     private val mFragmentList = ArrayList<BaseFragment>()
-    private var mCurrentSelPos = 0
+    private val myReceiver = MyReceiver(this)
 
     private var mBinder: CountDownService.MyBinder? = null
 
@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, MyReceiver.Recei
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION xor View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+//        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION xor View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
         init()
         showLogE("create")
     }
@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, MyReceiver.Recei
     override fun onResume() {
         super.onResume()
         showLogE("resume")
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION xor View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+//        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION xor View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
         if (!AccessibilityUtils.isAccessibilityOpen(this)) {
             showSnakeBarWithAction("麻烦开一下辅助权限，谢谢 ( ˘•ω•˘ )", cl_gen, "前往",
                     View.OnClickListener { AccessibilityUtils.goAccess(this) },
@@ -77,11 +77,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, MyReceiver.Recei
     override fun onDestroy() {
         super.onDestroy()
         showLogE("destroy")
+        unregisterReceiver(myReceiver)
         unbindService(mConn)
     }
 
     private fun init() {
-        setViewsOnClickListener(this, iv_home, iv_achievement, iv_mine, iv_shutdown)
+        setViewsOnClickListener(this, iv_home, iv_achievement, iv_mine)
         mFragmentList.add(MainHomeFragment.newInstance("首页"))
         mFragmentList.add(TestFragment.newInstance("成就"))
         mFragmentList.add(TestFragment.newInstance("我的"))
@@ -99,7 +100,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, MyReceiver.Recei
         bindService(Intent(this, CountDownService::class.java), mConn, Context.BIND_AUTO_CREATE)
         val filter = IntentFilter()
         filter.addAction(Constants.RECEIVER_ACTION_DETECTION)
-        registerReceiver(MyReceiver(this), filter)
+        registerReceiver(myReceiver, filter)
     }
 
 
@@ -113,9 +114,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, MyReceiver.Recei
             }
             R.id.iv_mine -> {
                 vp_content.currentItem = 2
-            }
-            R.id.iv_shutdown -> {//后退
-                back()
             }
         }
     }
@@ -147,7 +145,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, MyReceiver.Recei
      * 当前应用是否是前台应用的监听
      */
     override fun isForeground(isForeground: Boolean) {
-        mBinder?.cancelCountDown()
+        if (!isForeground){
+            showLogE("这里取消的")
+            mBinder?.cancelCountDown()
+        }
     }
 
     private var firstTime = 0L

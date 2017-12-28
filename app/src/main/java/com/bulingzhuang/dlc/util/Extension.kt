@@ -31,8 +31,8 @@ fun Context.showToast(msg: String, length: Int = Toast.LENGTH_SHORT) {
 /**
  * 普通Toast(扩展String)
  */
-fun String.showToast(context: Context, length: Int = Toast.LENGTH_SHORT){
-    Toast.makeText(context,this,length).show()
+fun String.showToast(context: Context, length: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(context, this, length).show()
 }
 
 /**
@@ -51,6 +51,13 @@ fun Context.showSnakeBarWithAction(msg: String, genView: View, actionTitle: Stri
 }
 
 /**
+ * dp转px
+ */
+fun Context.dp2px(dpValue: Float): Int {
+    return (this.resources.displayMetrics.density * dpValue + 0.5f).toInt()
+}
+
+/**
  * 普通LogE
  */
 fun showLogE(msg: String, tag: String = "BankSteel") {
@@ -59,6 +66,6 @@ fun showLogE(msg: String, tag: String = "BankSteel") {
     }
 }
 
-fun setViewsOnClickListener(listener: View.OnClickListener,vararg views: View){
+fun setViewsOnClickListener(listener: View.OnClickListener, vararg views: View) {
     views.forEach { it.setOnClickListener(listener) }
 }

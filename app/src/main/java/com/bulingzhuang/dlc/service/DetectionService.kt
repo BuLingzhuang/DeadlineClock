@@ -33,5 +33,4 @@ class DetectionService : AccessibilityService() {
             sendBroadcast(intent)
         }
     }
-
 }
