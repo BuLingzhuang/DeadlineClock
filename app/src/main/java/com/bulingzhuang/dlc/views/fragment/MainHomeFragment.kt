@@ -84,12 +84,22 @@ class MainHomeFragment : BaseFragment(), View.OnClickListener {
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         context.bindService(Intent(context, CountDownService::class.java), mConn, Context.BIND_AUTO_CREATE)
-        scv_progress.setListener {
-            when (it) {
-                in 0..2400 -> tv_coin.text = "x1"
-                in 2401..4800 -> tv_coin.text = "x2"
-                else -> tv_coin.text = "x3"
+        scv_progress.setListener { isEdit, cNum ->
+            if (isEdit) {
+                when (cNum) {
+                    in 0 until 1 -> tv_coin.text = "x0"
+                    in 1 until  1800 -> tv_coin.text = "x1"
+                    in 1800 .. 3600 -> tv_coin.text = "x2"
+                    in 3601 .. 5400 -> tv_coin.text = "x3"
+                    in 5401 .. 7200 -> tv_coin.text = "x4"
+                    //TODO 待调整
+                }
             }
+//            in 0 until 1 -> tv_coin.text = "x0"
+//            in 1 .. 1800 -> tv_coin.text = "x1"
+//            in 1801 .. 3600 -> tv_coin.text = "x2"
+//            in 3601 .. 5400 -> tv_coin.text = "x3"
+//            in 5401 .. 7200 -> tv_coin.text = "x4"
         }
         scv_progress.setEdit(true)
         setViewsOnClickListener(this, btn_start)

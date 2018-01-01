@@ -50,7 +50,7 @@ public class SesameCreditView extends View {
     private RectF mRectF;
 
     interface NumChangeListener {
-        void numChange(int cNum);
+        void numChange(boolean isEdit,int cNum);
     }
 
     public void setListener(NumChangeListener listener) {
@@ -74,7 +74,7 @@ public class SesameCreditView extends View {
             currentNum = cNum;
         }
         if (mListener != null) {
-            mListener.numChange(currentNum);
+            mListener.numChange(isEdit,currentNum);
         }
         if (isEdit) {
             secondNum = currentNum;
@@ -268,7 +268,7 @@ public class SesameCreditView extends View {
                         if (v > 360) {
                             v -= 360;
                         }
-                        setCurrentNum((int) (v / 6) * 120);
+                        setCurrentNum((int) (v / 15) * 300);
 //                        Log.e("blz", "atan=" + v);
                     }
                     break;

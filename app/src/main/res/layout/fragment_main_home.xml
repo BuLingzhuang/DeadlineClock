@@ -10,7 +10,7 @@
         android:id="@+id/scv_progress"
         android:layout_width="320dp"
         android:layout_height="260dp"
-        app:currentNum="5400"
+        app:currentNum="4800"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
